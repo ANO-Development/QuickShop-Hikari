@@ -8,6 +8,10 @@ plugins {
 }
 
 dependencies {
+    testImplementation(libs.paper.api.pinned)
+    testImplementation("org.junit.jupiter:junit-jupiter:5.11.4")
+    testImplementation("org.mockito:mockito-core:5.15.2")
+    testRuntimeOnly("org.junit.platform:junit-platform-launcher")
     compileOnly(libs.paper.api.pinned)
     api(project(":quickshop-api"))
     implementation(project(":platform:quickshop-platform-paper"))
@@ -100,6 +104,14 @@ dependencies {
 
     compileOnly(libs.fawe.core, worldeditExcludes)
     compileOnly(libs.worldedit.bukkit, worldeditExcludes)
+}
+
+tasks.test {
+    useJUnitPlatform()
+}
+
+configurations.testRuntimeClasspath {
+    extendsFrom(configurations.compileOnly.get())
 }
 
 sourceSets {

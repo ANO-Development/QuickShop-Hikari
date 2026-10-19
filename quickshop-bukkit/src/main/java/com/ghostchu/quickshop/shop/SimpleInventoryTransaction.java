@@ -95,10 +95,10 @@ public class SimpleInventoryTransaction implements InventoryTransaction {
       return true;
     }
 
-    //TODO: How to make this anti-abusable? Disable it for custom matcher? We can't really guarantee trades for that
-    final AddItemOperation addOperation = (removeResult != null && removeResult.result() instanceof ItemRemoveResult)?
-                                          new AddItemOperation(((ItemRemoveResult)removeResult.result()).removed().values().toArray(ItemStack[]::new), to) : new AddItemOperation(item, amount, to);
-    final OperationResult<?> addResult = this.executeOperation(new AddItemOperation(item, amount, to));
+    final AddItemOperation addOperation = removeResult != null && removeResult.result() instanceof ItemRemoveResult removed
+                                         ? new AddItemOperation(removed.removed().values().toArray(ItemStack[]::new), to)
+                                         : new AddItemOperation(item, amount, to);
+    final OperationResult<?> addResult = this.executeOperation(addOperation);
 
     if(!addResult.success()) {
 
@@ -107,6 +107,11 @@ public class SimpleInventoryTransaction implements InventoryTransaction {
       return false;
     }
     callback.onSuccess(this);
+    return true;
+  }
+
+  /** Allows integrations for stateful items to require transfers of the actual removed stacks. */
+  public static boolean preservesRemovedItemIdentity() {
     return true;
   }
 
